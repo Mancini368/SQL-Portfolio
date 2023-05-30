@@ -68,5 +68,3 @@ FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
 GROUP BY hour_of_day
 ORDER BY order_count DESC;
 
-
--- Stay tuned as I continue this analysis :)
