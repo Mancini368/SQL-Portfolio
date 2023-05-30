@@ -1,0 +1,63 @@
+Hiking schema I've created using MySQL workbench with data I've compiled for hikes in the surrounding middle TN region:
+
+CREATE DATABASE hiking_trails;
+
+CREATE TABLE hiking_trails.trails (
+  trail_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  trail_name BIGINT NOT NULL,
+  state_park VARCHAR(150) NOT NULL,
+  trailhead VARCHAR(150) NOT NULL,
+);
+
+CREATE TABLE hiking_trails.trail_details (
+  trail_details_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  trail_id BIGINT NOT NULL,
+  difficulty VARCHAR(45) NOT NULL,
+  completion_time DECIMAL(3,2) NOT NULL,
+  features VARCHAR(150) NOT NULL,
+  distance DECIMAL(3,2) NOT NULL,
+  rating DECIMAL(2,1) NOT NULL,
+);
+
+
+INSERT INTO trails (trail_id, trail_name, state_park, trailhead)
+VALUES 
+
+(1, 'meadow trail hike', 'south cumberland', 'visitor center trailhead'), 
+(2, 'lone rock trail', 'south cumberland', 'grundy lakes trailhead'), 
+(3, 'grundy day loop', 'south cumberland', 'fiery gizzard trailhead'), 
+(4, 'sycamore falls loop', 'south cumberland', 'fiery gizzard trailhead'), 
+(5, 'climbers loop', 'south cumberland', 'fiery gizzard trailhead'), 
+(6, 'ravens point loop', 'south cumberland', 'fiery gizzard trailhead'), 
+(7, 'foster falls to small wilds', 'south cumberland', 'fiery gizzard trailhead'), 
+(8, 'buggy top trail', 'south cumberland', 'buggy top trailhead'), 
+(9, 'high ridge trail', 'bledsoe creek', 'high ridge trail trailhead'), 
+(10, 'shoreline trail', 'bledsoe creek', 'shoreline trail trailhead'), 
+(11, 'owl ridge', 'bledsoe creek', 'owl ridge trailhead'), 
+(12, 'birdson nature trail', 'bledsoe creek', 'birdson nature trailhead'), 
+(13, 'wayo mix memorial trail', 'bledsoe creek', 'wayo mix memorial trailhead'), 
+(14, 'reading ranger story trail', 'bledsoe creek', 'reading ranger story trailhead')
+;
+
+SELECT * FROM trails
+
+INSERT INTO trail_details (trail_details_id, difficulty, features, distance, rating)
+VALUES 
+
+(1, 'easy', 'pond', '1', '4.1'), 
+(2, 'easy', 'lake', '2.3', '4.1'), 
+(3, 'moderate', 'waterfall, swimming', '2', '4.7'), 
+(4, 'moderate', 'waterfall, swimming', '3', '4.6'), 
+(5, 'moderate', 'waterfall', '2', '4.6'), 
+(6, 'difficult', 'waterfall, springs, cave', '10', '4.7'), 
+(7, 'null', 'waterfall', '5', '4.6'), 
+(8, 'moderate','cave', '4', '4.6'), 
+(9, 'difficult', 'null', '1.4', '4.5'), 
+(10, 'easy', 'null', '2.1', '4.1'), 
+(11, 'difficult', 'null', '0.5', '4.1'), 
+(12, 'ADA/paved', 'stream, lake', '0.5', '4.0'), 
+(13, 'ADA/paved', 'stream, lake', '1', '4.3'), 
+(14, 'easy', 'stroller friendly', '.5', '4.0')
+;
+
+SELECT * FROM trail_details;
