@@ -1,7 +1,7 @@
 Using a dataset from Maven Analytics to analyze a year's worth of sales from a pizza place, including the date and time of each order and the pizzas served, with additional details on the type, size, quantity, price, and ingredients.
 
--- I began by sketching out an EER diagram to determine relationships between primary keys and foreign keys among the 4 tables; order_details, orders, pizzas and pizza_types.
--- I began data exploration, cleaning and analysis in BigQuery as follows:
+-- I started by sketching out an EER diagram to determine relationships between primary keys and foreign keys among the 4 tables; order_details, orders, pizzas and pizza_types.
+-- I began exploration, cleaning and analysis in BigQuery as follows:
   
 SELECT * FROM `sql-project-1-383101.pizza_sales.order_details`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.orders`;
@@ -32,10 +32,10 @@ JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
 SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.orders`;         --21350 total table orders
 SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.order_details`   --48620 total pizzas ordered
 
--- How many orders per day? What day of the week? order by most amount of orders per to day least
+-- How many orders per day? What day of the week do the orders pertain to? Group by date and order by largest number of orders per day to least. 
 SELECT
   date,
-  COUNT(DISTINCT order_details.order_details_id) AS orders_per_day,
+  COUNT(DISTINCT order_details.order_details_id) AS order_count,
   FORMAT_TIMESTAMP('%A', date) AS day_of_week
 FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
 JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
@@ -48,8 +48,9 @@ SELECT
   EXTRACT(DAYOFWEEK FROM date) AS day_of_week, 
   AVG(order_count) AS average_orders_per_day,
 FROM (
-    SELECT date, 
-    COUNT(DISTINCT order_details.order_details_id ) AS order_count,
+    SELECT 
+      date, 
+      COUNT(DISTINCT order_details.order_details_id ) AS order_count,
   FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
     JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
     ON orders.order_id=order_details.order_id
