@@ -1,4 +1,4 @@
-Hiking schema I've created using MySQL workbench with data I've compiled for hikes in the surrounding middle TN region:
+Hiking schema I created using MySQL workbench with data I've compiled for hikes in middle TN and surrounding region:
 
 CREATE DATABASE hiking_trails;
 
