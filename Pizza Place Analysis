@@ -57,7 +57,7 @@ FROM (
     GROUP BY date, time
 )
 GROUP BY day_of_week;
-
+ 
 
 
  -- peak hours of buisness
