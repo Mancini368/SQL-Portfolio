@@ -1,6 +1,6 @@
 Using a dataset from Maven Analytics to analyze a year's worth of sales from a pizza place, including the date and time of each order and the pizzas served, with additional details on the type, size, quantity, price, and ingredients.
 
--- I started by sketching out an EER diagram to determine relationships between primary keys and foreign keys among the 4 tables; order_details, orders, pizzas and pizza_types.
+-- I started by sketching out an ERD diagram to determine relationships between primary keys and foreign keys among the 4 tables and datatypes for each column; order_details, orders, pizzas and pizza_types.
 -- I began exploration, cleaning and analysis in BigQuery as follows:
   
 SELECT * FROM `sql-project-1-383101.pizza_sales.order_details`;
@@ -8,7 +8,7 @@ SELECT * FROM `sql-project-1-383101.pizza_sales.orders`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizza_type`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizzas`;
 
--- alter table to change column names in pizza_type
+-- ALTER TABLE TO CHANGE COLUMN NAMES FOR APPROPRIATE NAMING CONVENTIONS
 CREATE TABLE pizza_sales.pizza_type
 AS SELECT
   string_field_0 AS pizza_type_id,
@@ -18,7 +18,7 @@ AS SELECT
 FROM
   pizza_sales.pizza_types;
 
--- join the 4 tables to explore all data
+-- EXPLORE TABLES
 SELECT *
 FROM `sql-project-1-383101.pizza_sales.orders` AS orders
 JOIN `sql-project-1-383101.pizza_sales.order_details` AS order_details
@@ -29,43 +29,187 @@ JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
   ON pizzas.pizza_type_id=pizza_type.pizza_type_id
 ;
 
-SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.orders`;         --21350 total table orders
-SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.order_details`   --48620 total pizzas ordered
+SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.orders`;       
+SELECT COUNT(*) FROM `sql-project-1-383101.pizza_sales.order_details` 
 
--- How many orders per day? What day of the week do the orders pertain to? Group by date and order by largest number of orders per day to least. 
+
+-- WHAT ARE THE TOTAL ORDERS FOR EACH DATE & DAY OF THE WEEK? ORDER FROM MOST ORDERS PER DAY TO LEAST.
 SELECT
   date,
-  COUNT(DISTINCT order_details.order_details_id) AS order_count,
+  COUNT(DISTINCT orders.order_id) AS orders_per_day,
   FORMAT_TIMESTAMP('%A', date) AS day_of_week
-FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
-JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
-  ON orders.order_id=order_details.order_id
+FROM `sql-project-1-383101.pizza_sales.orders` AS orders
  GROUP BY date
  ORDER BY orders_per_day DESC;
-
--- Average number of orders per day of the week
+ 
+ 
+-- HOW MANY ORDERS ON AVERAGE PER DAY OF WEEK? 
 SELECT 
   EXTRACT(DAYOFWEEK FROM date) AS day_of_week, 
   AVG(order_count) AS average_orders_per_day,
 FROM (
     SELECT 
-      date, 
-      COUNT(DISTINCT order_details.order_details_id ) AS order_count,
-  FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
-    JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
-    ON orders.order_id=order_details.order_id
-    GROUP BY date, time
+    date,
+    COUNT(DISTINCT orders.order_id ) AS order_count,
+  FROM `sql-project-1-383101.pizza_sales.orders` AS orders
+    GROUP BY date
 )
 GROUP BY day_of_week;
- 
 
 
- -- peak hours of buisness
-SELECT EXTRACT(HOUR FROM TIMESTAMP(DATETIME(orders.date, orders.time))) AS hour_of_day,
+ -- WHAT ARE THE PEAK BUISNESS HOURS?
+SELECT
+  EXTRACT(HOUR FROM TIMESTAMP(DATETIME(orders.date, orders.time))) AS hour_of_day,
        COUNT(*) AS order_count
-FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
-    JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
-    ON orders.order_id=order_details.order_id
+FROM `sql-project-1-383101.pizza_sales.orders` AS orders
 GROUP BY hour_of_day
 ORDER BY order_count DESC;
+
+
+-- HOW MANY PIZZAS ON AVERAGE ARE TYPICALLY IN AN ORDER? 
+SELECT 
+  AVG(pizza_count) AS average_pizzas_per_order
+FROM (
+  SELECT 
+    orders.order_id, 
+    COUNT(order_details.pizza_id) AS pizza_count
+  FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+  JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
+    ON orders.order_id = order_details.order_id
+  GROUP BY orders.order_id
+);
+
+
+-- WHAT ARE THE BEST SELLING PIZZAS?
+SELECT 
+  order_details.pizza_id, 
+  COUNT(*) AS total_orders,
+  pizza_type.name,
+  pizzas.price,
+  order_details.quantity
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
+  ON pizzas.pizza_type_id=pizza_type.pizza_type_id
+GROUP BY order_details.pizza_id,  pizza_type.name, order_details.quantity, pizzas.price
+ORDER BY total_orders DESC
+LIMIT 10;
+
+
+-- WHAT ARE THE HIGHEST REVENUE PRODUCING PIZZAS?
+SELECT 
+  SUM(order_details.quantity * pizzas.price) AS total_revenue,
+  order_details.pizza_id, 
+  COUNT(*) AS total_orders,
+  pizza_type.name,
+  pizzas.price,
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
+  ON pizzas.pizza_type_id = pizza_type.pizza_type_id
+GROUP BY order_details.pizza_id, pizza_type.name, pizzas.price
+ORDER BY total_revenue DESC
+LIMIT 10;
+
+
+-- HOW MUCH MONEY WAS MADE THIS YEAR?
+SELECT 
+  SUM(order_details.quantity * pizzas.price) AS total_revenue
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+;
+
+
+-- IS THERE A SEASONALITY TO THE SALES? LOOKING AT SALES AGGREGATED BY MONTH, THEN QUARTER. 
+SELECT 
+  DATE_TRUNC(orders.date, MONTH) AS month,
+  SUM(order_details.quantity * pizzas.price) AS total_revenue
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
+  ON orders.order_id = order_details.order_id
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+GROUP BY month
+ORDER BY total_revenue
+;
+
+
+SELECT 
+  EXTRACT(QUARTER FROM orders.date) AS quarter,
+  SUM(order_details.quantity * pizzas.price) AS total_revenue
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
+  ON orders.order_id = order_details.order_id
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+GROUP BY quarter
+ORDER BY quarter
+;
+
+
+-- WHAT ARE THE AVERAGE MONTHLY SALES?
+SELECT 
+  AVG(total_revenue) AS average_monthly_revenue
+FROM (
+  SELECT 
+    DATE_TRUNC(orders.date, MONTH) AS month,
+    SUM(order_details.quantity * pizzas.price) AS total_revenue
+  FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+  JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
+    ON orders.order_id = order_details.order_id
+  JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+    ON order_details.pizza_id = pizzas.pizza_id
+  GROUP BY month
+);
+
+
+-- WHAT ARE THE HIGHEST PRODUCING DAYS OF THE YEAR/ MOST PROFITABLE HOLIDAYS?
+SELECT 
+  orders.date,
+  SUM(order_details.quantity * pizzas.price) AS total_revenue
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.orders` AS orders
+  ON orders.order_id = order_details.order_id
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+GROUP BY orders.date
+ORDER BY total_revenue DESC
+LIMIT 10;
+
+
+-- ARE THERE ANY PIZZAS THAT SHOULD BE TAKEN OFF THE MENU? LETS LOOK AT THE PIZZAS ORDERED THE LEAST.
+SELECT 
+  order_details.pizza_id, 
+  COUNT(*) AS total_orders,
+  pizza_type.name,
+  pizzas.price,
+  order_details.quantity
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
+  ON pizzas.pizza_type_id=pizza_type.pizza_type_id
+GROUP BY order_details.pizza_id,  pizza_type.name, order_details.quantity, pizzas.price
+ORDER BY total_orders
+LIMIT 5;
+
+
+-- DO PIZZAS ORDERED THE LEAST ALSO PRODUCE LOWEST SALES?
+SELECT 
+  SUM(order_details.quantity * pizzas.price) AS total_revenue,
+  order_details.pizza_id, 
+  COUNT(*) AS total_orders,
+  pizza_type.name,
+  pizzas.price,
+FROM `sql-project-1-383101.pizza_sales.order_details` AS order_details
+JOIN `sql-project-1-383101.pizza_sales.pizzas` AS pizzas
+  ON order_details.pizza_id = pizzas.pizza_id
+JOIN `sql-project-1-383101.pizza_sales.pizza_type` AS pizza_type
+  ON pizzas.pizza_type_id = pizza_type.pizza_type_id
+GROUP BY order_details.pizza_id, pizza_type.name, pizzas.price
+ORDER BY total_revenue asc
+LIMIT 5;
 
