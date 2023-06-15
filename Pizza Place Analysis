@@ -1,4 +1,4 @@
-Using a dataset from Maven Analytics to analyze a year's worth of sales from a pizza place, including the date and time of each order and the pizzas served, with additional details on the type, size, quantity, price, and ingredients.
+Analyze a year's worth of sales from a pizza restauraunt, including peak times and product performance using BigQuery. 
 
 -- I started by sketching out an ERD diagram to determine relationships between primary keys and foreign keys among the 4 tables and datatypes for each column; order_details, orders, pizzas and pizza_types.
 -- I began exploration, cleaning and analysis in BigQuery as follows:
@@ -49,17 +49,24 @@ ORDER BY total_order_quantity DESC;
 -- HOW MANY PIZZA ORDERS ON AVERAGE PER DAY OF WEEK? 
 SELECT 
   EXTRACT(DAYOFWEEK FROM date) AS day_of_week, 
-  AVG(order_quantity) AS average_orders_per_day
+  CASE EXTRACT(DAYOFWEEK FROM date)
+    WHEN 1 THEN 'Sunday'
+    WHEN 2 THEN 'Monday'
+    WHEN 3 THEN 'Tuesday'
+    WHEN 4 THEN 'Wednesday'
+    WHEN 5 THEN 'Thursday'
+    WHEN 6 THEN 'Friday'
+    WHEN 7 THEN 'Saturday'
+  END AS day_of_week_name,
+  AVG(order_count) AS average_orders_per_day
 FROM (
   SELECT 
     date,
-    SUM(order_details.quantity) AS order_quantity
+    COUNT(DISTINCT orders.order_id ) AS order_count
   FROM `sql-project-1-383101.pizza_sales.orders` AS orders
-  JOIN `sql-project-1-383101.pizza_sales.order_details` AS order_details
-    ON orders.order_id = order_details.order_id
   GROUP BY date
-) 
-GROUP BY day_of_week
+)
+GROUP BY day_of_week, day_of_week_name
 ORDER BY average_orders_per_day DESC;
 
 
