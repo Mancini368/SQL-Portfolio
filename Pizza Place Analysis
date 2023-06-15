@@ -1,4 +1,4 @@
-Analyze a year's worth of sales from a pizza restauraunt, including peak times and product performance using BigQuery. 
+Analyze a year's worth of sales from a pizza restauraunt, including peak times and product performance using BigQuery.
 
 -- I started by sketching out an ERD diagram to determine relationships between primary keys and foreign keys among the 4 tables and datatypes for each column; order_details, orders, pizzas and pizza_types.
 -- I began exploration, cleaning and analysis in BigQuery as follows:
@@ -228,17 +228,17 @@ ORDER BY total_revenue
 LIMIT 10;
 
 
---*|FINAL ANALYSIS|*--
+                                                                    --*|FINAL ANALYSIS|*--
 
-The busiest days of the week with the most pizzas ordered are Thursdays through Saturday, with an average between 144-164 pizza orders placed each day.
-Sundays  & Tuesdays  are the slowest days having the least pizza orders placed with an average of 116-132 pizza orders  placed each day.
-Peak hours are at lunchtime at 12pm & 1pm and again at dinner at 5pm & 6pm with most orders placed during these times. 
+The busiest days of the week with the most pizzas ordered are Thursdays through Saturday, Friday being the top producing day with an average of 71 orders placed each Friday.
+Sundays  & Tuesdays  are the slowest days having the least pizza orders placed.
+Peak hours are at lunchtime between 12pm-1pm with an average of 2,520 orders placed and again at dinner at 6pm with an average of 2,399 orders placed. 
 Additionally, Peak holidays with most pizza orders placed were on Thanksgiving, Black Friday and 4th of July.
 
-The top 5 best selling pizzas for the year with largest quantity ordered are The Big Meat Pizza, The Thai Chicken Pizza, The Five Cheese Pizza, The Four Cheese Pizza and the Classic Deluxe Pizza. 
-The top 5 revenue producing pizzas for the year are The Thai Chicken Pizza, The Five Cheese Pizza, The Four Cheese Pizza, The Spicy Italian Pizza and The Big Meat Pizza. 
+The top 5 best selling pizzas for the year with largest quantity ordered are The Big Meat Pizza with a total of 1,176 orders, followed by The Thai Chicken Pizza, The Five Cheese Pizza, The Four Cheese Pizza and the Classic Deluxe Pizza. 
+The top 5 revenue producing pizzas for the year are The Thai Chicken Pizza with total revenue of $29,257, followed by The Five Cheese Pizza, The Four Cheese Pizza, The Spicy Italian Pizza and The Big Meat Pizza. 
 
-There was $817,860.05 in total revenue for the year 2015 with sales showing consistency on a monthy and quarterly basis. 
+There was $817,860.05 in total revenue for the year 2015 with sales tracking consistently on a monthly and quarterly basis. 
 Average monthly revenue is $68,155 with the lowest producing month in October at $64,028 and highest producing month in July at $72,558.
 Top 5 highest revenue producing days of the year include Thanksgiving, Black Friday, July 3rd & 4th.
 
