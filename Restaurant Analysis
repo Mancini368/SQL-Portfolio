@@ -1,10 +1,10 @@
-Analyze a year's worth of sales from a pizza restauraunt, including peak times and product performance using BigQuery.
+Analyze a year's worth of sales from a pizza restaurant, including peak times and product performance using BigQuery.
 
 -- I started by sketching out an ERD diagram to determine relationships between primary keys and foreign keys among the 4 tables and datatypes for each column; order_details, orders, pizzas and pizza_types.
 -- I began exploration, cleaning and analysis in BigQuery as follows:
   
 SELECT * FROM `sql-project-1-383101.pizza_sales.order_details`;
-SELECT * FROM `sql-project-1-383101.pizza_sales.orders`;
+SELECT * FROM `sql-project-1-383101.pizza_sales.orders`;  
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizza_type`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizzas`;
 
