@@ -8,7 +8,7 @@ SELECT * FROM `sql-project-1-383101.pizza_sales.orders`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizza_type`;
 SELECT * FROM `sql-project-1-383101.pizza_sales.pizzas`;
 
--- ALTER TABLE TO CHANGE COLUMN NAMES FOR APPROPRIATE NAMING CONVENTIONS
+-- ALTER TABLE TO CHANGE COLUMN NAMES FOR APPROPRIATE NAMING CONVENTIONS  
 CREATE TABLE pizza_sales.pizza_type
 AS SELECT
   string_field_0 AS pizza_type_id,
