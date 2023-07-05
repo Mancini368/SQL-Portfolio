@@ -8,6 +8,6 @@ This repository contains SQL I've written using MySQL and BigQuery to create sch
 
 Feel free to browse and reach out to connect: Mancini368@gmail.com
 
-
+You can find the vizualizations for these analysis and others vizualizations on my Tableau page: https://public.tableau.com/app/profile/melissa6284 
 
 Thanks for stopping by!
