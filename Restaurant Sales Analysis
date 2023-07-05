@@ -1,4 +1,4 @@
-Analyze a year's worth of sales from a pizza restaurant, including peak times and product performance using BigQuery using JOIN, SUM, COUNT, FORMAT TIMESTAMP, EXTRACT, CASE, GROUP BY, ORDER BY, LIMIT
+Analyze a year's worth of sales from a pizza restaurant, including peak times and product performance using BigQuery using JOIN, SUM, COUNT, FORMAT TIMESTAMP, EXTRACT, CASE, Subqueries, GROUP BY, ORDER BY, LIMIT
 
 -- I started by sketching out an ERD diagram to determine relationships between primary keys and foreign keys among the 4 tables and datatypes for each column; order_details, orders, pizzas and pizza_types.
 -- I began exploration, cleaning and analysis in BigQuery as follows:
