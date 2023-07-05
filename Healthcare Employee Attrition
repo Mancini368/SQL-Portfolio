@@ -1,0 +1,47 @@
+BiqQuery analysis for employee attrition in healthcare using: WHERE, GROUP BY, ORDER BY, CASE, PARTITION BY
+
+
+
+SELECT Count(*) FROM `sql-project-1-383101.healthcare.employee_attrition`;
+
+--Employe turnover by job role
+SELECT COUNT(Attrition) As employee_attrition_count, JobRole FROM `sql-project-1-383101.healthcare.employee_attrition`
+Where attrition=true
+group by JobRole, Attrition;
+
+-- employee status and job satisfaction with role and years at company 
+SELECT employeeID, JobRole, JobSatisfaction, YearsAtCompany,
+  CASE
+    WHEN Attrition = true THEN 'Former Employee'
+    WHEN Attrition = false THEN 'Current Employee'
+  END AS employee_status
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY employeeID, JobRole, JobSatisfaction, YearsAtCompany, employee_status;
+
+--Average monthly income by department
+SELECT 
+  Department,
+  AVG(MonthlyIncome) AS AvgMonthlyIncome
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY Department
+ORDER BY AvgMonthlyIncome;
+
+--Average monthly salary by job role
+SELECT 
+  Department,
+  JobRole,
+  AVG(MonthlyIncome) AS AvgMonthlyIncome
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY Department, JobRole
+ORDER BY AvgMonthlyIncome;
+
+--Monthly salary per employee and average monthly salary by department
+SELECT 
+  EmployeeID,
+  JobRole,
+  Department,
+  MonthlyIncome,
+  AVG(MonthlyIncome) OVER (PARTITION BY Department) AS AvgMonthlyIncome
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY EmployeeID, JobRole, Department, MonthlyIncome
+ORDER BY AvgMonthlyIncome;
