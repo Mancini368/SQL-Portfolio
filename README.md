@@ -5,5 +5,17 @@
 Welcome to my SQL portfolio!
 This repository contains SQL I've written using MySQL and BigQuery to create schemas, write queries and my process analyzing data using SQL.
 Feel free to browse and reach out to connect: Mancini368@gmail.com
-
 Thanks for stopping by!
+
+Below I've listed the functions used throughout my analysis:
+
+JOIN 
+SUM
+COUNT
+FORMAT TIMESTAMP
+EXTRACT
+CASE
+Subqueries
+GROUP BY
+ORDER BY
+LIMIT
