@@ -4,10 +4,15 @@ BiqQuery analysis for employee attrition in healthcare using: WHERE, GROUP BY, O
 
 SELECT Count(*) FROM `sql-project-1-383101.healthcare.employee_attrition`;
 
---Employe turnover by job role
-SELECT COUNT(Attrition) As employee_attrition_count, JobRole FROM `sql-project-1-383101.healthcare.employee_attrition`
-Where attrition=true
-group by JobRole, Attrition;
+--Employee attrition by job role
+SELECT 
+  JobRole, 
+  COUNT(Attrition) AS employee_attrition_count, 
+  ROUND(AVG(JobSatisfaction), 2) AS satisfaction_rating 
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+WHERE Attrition = true
+GROUP BY JobRole, Attrition
+ORDER BY employee_attrition_count DESC;
 
 -- employee status and job satisfaction with role and years at company 
 SELECT employeeID, JobRole, JobSatisfaction, YearsAtCompany,
