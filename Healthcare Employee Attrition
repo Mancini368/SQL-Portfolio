@@ -1,4 +1,4 @@
-BiqQuery analysis for employee attrition in healthcare using: WHERE, GROUP BY, ORDER BY, CASE, PARTITION BY
+BiqQuery analysis for employee attrition in healthcare using: COUNT, ROUND, AVG, WHERE, GROUP BY, ORDER BY, CASE, PARTITION BY
 
 
 
