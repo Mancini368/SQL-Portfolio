@@ -10,6 +10,7 @@ You can also find the vizualizations for these analyses and others vizualization
 Feel free to browse and reach out to connect: 
 
 Email | Mancini368@gmail.com
+
 Linkedin | https://www.linkedin.com/in/melissa-mancini-/ 
 
 
