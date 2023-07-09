@@ -7,7 +7,10 @@ This repository contains SQL I've written using MySQL and BigQuery to create sch
 
 You can also find the vizualizations for these analyses and others vizualizations on my Tableau page: https://public.tableau.com/app/profile/melissa6284 
 
-Feel free to browse and reach out to connect: Mancini368@gmail.com | https://www.linkedin.com/in/melissa-mancini-/ 
+Feel free to browse and reach out to connect: 
+
+Email | Mancini368@gmail.com
+Linkedin | https://www.linkedin.com/in/melissa-mancini-/ 
 
 
 
