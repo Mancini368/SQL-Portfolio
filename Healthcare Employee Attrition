@@ -68,6 +68,17 @@ SELECT
   100 * COUNTIF(attrition = true AND OverTime = true) / COUNTIF(OverTime = true) AS attrition_rate
 FROM `sql-project-1-383101.healthcare.employee_attrition`;
 
+--Attrition and overtime rates by department
+SELECT 
+  Department,
+  SUM(EmployeeCount) AS employee_count,
+  COUNTIF(OverTime = true) AS overtime_count,
+  100 * COUNTIF(OverTime = true) / COUNT(*) AS overtime_rate,
+  COUNTIF(attrition = true AND OverTime = true) AS count_attrition_with_overtime,
+  100 * COUNTIF(attrition = true AND OverTime = true) / COUNTIF(OverTime = true) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY Department
+ORDER BY attrition_rate DESC;
 
 -- Attrition rate based on frequency of business travel
 SELECT 
@@ -101,6 +112,39 @@ SELECT
 FROM `sql-project-1-383101.healthcare.employee_attrition`
 GROUP BY jobSatisfaction
 ORDER BY attrition_rate DESC;
+
+--Attrition by gender
+SELECT 
+  Gender,
+  SUM(EmployeeCount) employee_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY Gender;
+
+--Attrition and hourly rate
+SELECT 
+  CASE 
+    WHEN HourlyRate <= 65 THEN '65k or less'
+    WHEN HourlyRate > 65 THEN 'Greater than 65k'
+  END AS hourly_rate_group,
+  SUM(EmployeeCount) AS employee_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY hourly_rate_group
+ORDER BY attrition_rate DESC;
+
+--Attrition by work life balance rating
+SELECT 
+  WorkLifeBalance,
+  SUM(EmployeeCount) employee_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY WorkLifeBalance
+ORDER BY attrition_rate DESC;
+
 
 
 
