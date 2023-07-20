@@ -1,4 +1,4 @@
-BiqQuery analysis for employee attrition in healthcare using: COUNT, ROUND, AVG, WHERE, GROUP BY, ORDER BY, CASE, PARTITION BY
+BiqQuery analysis for employee attrition in healthcare using: COUNT,COUNTIF ROUND, AVG, WHERE, GROUP BY, ORDER BY, CASE, PARTITION BY
 
 
 
@@ -50,3 +50,60 @@ SELECT
 FROM `sql-project-1-383101.healthcare.employee_attrition`
 GROUP BY EmployeeID, JobRole, Department, MonthlyIncome
 ORDER BY AvgMonthlyIncome;
+
+-- Attrition rate by department
+SELECT 
+  Department,
+  SUM(EmployeeCount) num_of_employees,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY Department
+ORDER BY attrition_rate DESC;
+
+--Attrition rate for employees who worked OT
+SELECT 
+  COUNTIF(attrition = true AND OverTime = true) AS count_attrition_with_overtime_worked,
+  COUNTIF(OverTime = true) AS overtime_count,
+  100 * COUNTIF(attrition = true AND OverTime = true) / COUNTIF(OverTime = true) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`;
+
+
+-- Attrition rate based on frequency of business travel
+SELECT 
+  BusinessTravel,
+  Count(BusinessTravel) AS travel_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(BusinessTravel) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY BusinessTravel;
+
+--Attrition rate by distance from home
+SELECT 
+  CASE 
+    WHEN DistanceFromHome < 10 THEN 'Less than 10 miles'
+    WHEN DistanceFromHome >= 10 AND DistanceFromHome <= 20 THEN '10-20 miles'
+    WHEN DistanceFromHome > 20 THEN 'Greater than 20 miles'
+  END AS distance_group,
+  SUM(EmployeeCount) AS employee_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY distance_group
+ORDER BY attrition_rate DESC;
+
+--Attrition rate by job satisfaction
+SELECT 
+  jobSatisfaction,
+  SUM(EmployeeCount) employee_count,
+  COUNTIF(attrition = true) AS count_attrition,
+  100 * COUNTIF(attrition = true) / COUNT(*) AS attrition_rate
+FROM `sql-project-1-383101.healthcare.employee_attrition`
+GROUP BY jobSatisfaction
+ORDER BY attrition_rate DESC;
+
+
+
+
+
+
