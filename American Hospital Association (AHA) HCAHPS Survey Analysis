@@ -1,0 +1,266 @@
+SELECT COUNT(*) FROM questions; -- Total survey questions: 19
+SELECT COUNT(measure) FROM measures; -- Total survey measures: 10
+SELECT COUNT(*) FROM national_results; -- Count of national_results: 90
+SELECT COUNT(*) FROM state_results; -- Count of state_results: 4580
+SELECT COUNT(*) FROM responses; -- Count of responses: 36703
+SELECT DISTINCT(region) FROM states; -- 9 total regions
+SELECT COUNT(DISTINCT(facility_id)) FROM responses; -- Count of facilities: 4647
+SELECT AVG(response_rate_percent) FROM responses; -- average total response rate 26.4
+
+-- create view to combine all survey components into one table
+CREATE VIEW survey AS
+    (SELECT 
+        q.question_num,
+        m.measure_id,
+        m.measure,
+        q.question,
+        type,
+        q.bottom_box_answer bba,
+        q.middle_box_answer mba,
+        q.top_box_answer tba
+    FROM measures m
+            JOIN questions q ON m.measure_id = q.measure_id);
+
+-- National totals
+SELECT
+    MIN(bottom_box_percentage),
+    MAX(bottom_box_percentage),
+    AVG(bottom_box_percentage)
+FROM national_results;
+
+SELECT
+    MIN(top_box_percentage),
+    MAX(top_box_percentage),
+    AVG(top_box_percentage)
+FROM national_results;
+
+-- AVG response by measure type
+SELECT 
+    AVG(bottom_box_percentage),
+    AVG(top_box_percentage),
+    type
+FROM national_results
+JOIN measures ON national_results.measure_id = measures.measure_id
+GROUP BY type;
+
+-- scores by release_year and type
+SELECT 
+	release_year,
+    AVG(bottom_box_percentage),
+    AVG(top_box_percentage),
+    type
+FROM national_results
+JOIN measures ON national_results.measure_id = measures.measure_id
+GROUP BY type, release_year;
+
+-- AVG response by measure
+SELECT 
+ 	ROUND(AVG(bottom_box_percentage), 1) percent_least_pos,
+	ROUND(AVG(top_box_percentage), 1) percent_most_pos,
+	measure,
+  type
+ FROM national_results
+	JOIN measures ON national_results.measure_id = measures.measure_id
+	GROUP BY measure, type
+         ORDER BY percent_least_pos, percent_most_pos;
+
+-- average response (least and most positive answer) by release year
+SELECT 
+ 	release_year,
+  ROUND(AVG(bottom_box_percentage), 1) percent_least_positive,
+	ROUND(AVG(top_box_percentage), 1) percent_most_positive
+ FROM national_results
+      GROUP BY release_year
+      ORDER BY release_year;
+
+-- bottom 5 survey questions
+SELECT 
+ 	ROUND(AVG(bottom_box_percentage), 1) percent_least_pos,
+	questions.question,
+  measure
+ FROM national_results
+	JOIN measures ON national_results.measure_id = measures.measure_id
+         JOIN questions ON questions.measure_id = measures.measure_id
+    GROUP BY question, measure
+    ORDER BY percent_least_pos
+    LIMIT 5;
+  
+-- top 5 survey questions
+SELECT 
+	ROUND(AVG(top_box_percentage), 1) percent_most_pos,
+	questions.question,
+	measure
+FROM national_results
+	JOIN measures ON national_results.measure_id = measures.measure_id
+	JOIN questions ON questions.measure_id = measures.measure_id
+GROUP BY question, measure
+ORDER BY percent_most_pos DESC
+LIMIT 5;
+
+-- top and bottom scores by release year
+SELECT 
+ 	release_year,
+  ROUND(AVG(bottom_box_percentage), 1) percent_least_positive,
+	ROUND(AVG(top_box_percentage), 1) percent_most_positive
+ FROM national_results
+ GROUP BY release_year
+ ORDER BY release_year;--average response rate
+
+SELECT AVG(response_rate_percent) FROM responses;
+
+-- average response % (least and most positive answer) by release year & region
+WITH region_results AS
+(SELECT 
+ 	release_year,
+  ROUND(AVG(bottom_box_percentage), 1) percent_least_positive,
+	ROUND(AVG(top_box_percentage), 1) percent_most_positive,
+         region
+ FROM state_results
+ JOIN states ON state_results.state = states.state 
+ GROUP BY region, release_year)
+ 
+ SELECT * FROM region_results
+ WHERE region = 'East North Central'
+ ORDER BY release_year;
+
+-- results by year at the state level: by state
+WITH state_scores AS 
+	(SELECT 
+		release_year,
+		states.state,
+		ROUND(AVG(bottom_box_percentage), 1) percent_least_positive,
+		ROUND(AVG(top_box_percentage), 1) percent_most_positive
+ FROM state_results
+	JOIN states ON state_results.state = states.state 
+	GROUP BY state, release_year)
+
+ SELECT * FROM state_scores
+ WHERE state = 'TN'
+ ORDER BY release_year;
+
+-- results by year at the state level: by year
+WITH state_scores AS 
+	(SELECT 
+		release_year,
+		states.state,
+		ROUND(AVG(bottom_box_percentage), 1) percent_least_positive,
+		ROUND(AVG(top_box_percentage), 1) percent_most_positive
+ FROM state_results
+	JOIN states ON state_results.state = states.state 
+	GROUP BY state, release_year)
+
+ SELECT * FROM state_scores
+ WHERE release_year = '2015'
+ ORDER BY release_year;
+
+-- Average response rate by region:
+SELECT
+	region,
+  AVG(response_rate_percent) avg_rr
+FROM responses
+	JOIN states ON responses.state = states.state
+        GROUP BY region
+        ORDER BY avg_rr;
+
+--Which regions are above and below the total average response rate
+WITH RegionResponseRates AS (
+    SELECT
+        states.region,
+        AVG(response_rate_percent) AS avg_rr
+    FROM responses
+    JOIN states ON responses.state = states.state
+    GROUP BY states.region
+)
+SELECT
+    region,
+    avg_rr,
+    CASE WHEN avg_rr > (SELECT AVG(response_rate_percent) FROM responses) THEN 'Above Average' ELSE 'Below Average' END AS rate_status
+FROM RegionResponseRates
+GROUP BY region, rate_status
+ORDER BY avg_rr, region, rate_status;
+
+-- What is the count and percent of regions below average by year
+    WITH RegionResponseRates AS (
+    SELECT
+        release_year,
+        states.region,
+        AVG(response_rate_percent) AS avg_rr
+    FROM responses
+    JOIN states ON responses.state = states.state
+    GROUP BY release_year, states.region
+)
+SELECT
+    release_year,
+    COUNT(*) AS regions_below_average_count,
+    100 * COUNT(*) / (SELECT COUNT(*) FROM RegionResponseRates WHERE release_year = r.release_year) AS percentage_below_average
+FROM RegionResponseRates r
+WHERE avg_rr < (SELECT AVG(response_rate_percent) FROM responses)
+GROUP BY release_year;
+
+-- Region response rates by year for the bottom 5 regions with the lowest response rate
+SELECT
+	release_year,
+  region,
+  AVG(response_rate_percent) avg_rr
+FROM responses
+	JOIN states ON responses.state = states.state
+    GROUP BY release_year, region
+    ORDER BY avg_rr
+    LIMIT 5;
+
+-- response rate by state
+SELECT
+	states.state,
+  state_name,
+  AVG(response_rate_percent) avg_rr
+FROM responses
+	JOIN states ON responses.state = states.state
+    GROUP BY state, state_name
+    ORDER BY avg_rr;
+
+-- displaying states that are below average total response rate
+WITH StateResponseRates AS (
+    SELECT
+        states.state,
+        state_name,
+        AVG(response_rate_percent) AS avg_rr
+    FROM responses
+    JOIN states ON responses.state = states.state
+    GROUP BY state, state_name
+)
+SELECT
+    state,
+    state_name,
+    avg_rr
+FROM StateResponseRates
+WHERE avg_rr < (SELECT AVG(response_rate_percent) FROM responses)
+ORDER BY avg_rr;
+
+-- response rate by facility
+SELECT
+	 DISTINCT(facility_id),
+    states.state,
+    AVG(response_rate_percent) avg_rr
+FROM responses
+	JOIN states ON responses.state = states.state
+    GROUP BY state, facility_id
+    ORDER BY avg_rr;
+
+-- Which facilities are below the total average?
+WITH FacilityResponseRates AS (
+    SELECT
+        facility_id,
+        states.state,
+        AVG(response_rate_percent) AS avg_rr
+    FROM responses
+    JOIN states ON responses.state = states.state
+    GROUP BY states.state, facility_id
+)
+SELECT
+    facility_id,
+    state,
+    avg_rr
+FROM FacilityResponseRates
+WHERE avg_rr < (SELECT AVG(response_rate_percent) FROM responses)
+ORDER BY avg_rr
+LIMIT 5;
