@@ -4,6 +4,7 @@
 
 Welcome to my SQL portfolio!
 This repository contains SQL I've written using MySQL and BigQuery to create schemas, write queries and analyze data with SQL using functions including;
+
 MIN, MAX, SUM, AVG, COUNT, COUNTIF, AS, DISTINCT, ROUND, FORMAT TIMESTAMP, EXTRACT, JOIN, CASE, Subqueries, CTEs, CREATE VIEW, GROUP BY, ORDER BY, LIMIT, and PARTITION BY.
 
 You can also find the vizualizations for these analyses and others vizualizations on my Tableau page: https://public.tableau.com/app/profile/melissa6284 
@@ -14,6 +15,7 @@ Email | Mancini368@gmail.com
 
 Linkedin | https://www.linkedin.com/in/melissa-mancini-/ 
 
+Portfolio Website | mancini368.wixsite.com/melissa-mancini 
 
 
 Thanks for stopping by!
